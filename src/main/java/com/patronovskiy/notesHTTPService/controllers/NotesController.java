@@ -5,6 +5,7 @@ import com.patronovskiy.notesHTTPService.dao.NoteDAO;
 import com.patronovskiy.notesHTTPService.domain.Note;
 import com.patronovskiy.notesHTTPService.domain.RequestNote;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
@@ -32,9 +33,15 @@ public class NotesController {
     //todo возвращать не заметку, а ResponseEntity??
     //метод, сохраняющий заметку
     @PostMapping()
-    public Note saveNote(@RequestBody RequestNote requestNote) {
+    public ResponseEntity saveNote(@RequestBody RequestNote requestNote) {
+        //проверяем запрос
+        if(requestNote == null || requestNote.getContent() == null) {
+            return ResponseEntity.badRequest().body("Неверный запрос");
+        }
+
+        //если в порядке, сохраняем заметку и возвращаем ответ с заметкой и кодом 200
         Note note = noteDAO.save(requestNote, fileStoragePath, charsNumber, pathToVariables);
-        return note;
+        return ResponseEntity.ok(note);
     }
 
     @GetMapping("/{id}")

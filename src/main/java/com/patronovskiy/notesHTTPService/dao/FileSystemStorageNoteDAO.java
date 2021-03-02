@@ -25,6 +25,7 @@ public class FileSystemStorageNoteDAO implements NoteDAO {
             Note note = new FullNote(requestNote, id, charsNumber);
             ObjectMapper mapper = new ObjectMapper();
             //для имени файла берем id и записываем json
+            //todo создать директорию, если не существует
             mapper.writeValue(new File(fileStoragePath + note.getId() + ".json"), note);
             System.out.println("файл создан");
             return note;
