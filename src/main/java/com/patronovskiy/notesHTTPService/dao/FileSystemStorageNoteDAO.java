@@ -2,12 +2,12 @@ package com.patronovskiy.notesHTTPService.dao;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.patronovskiy.notesHTTPService.domain.AppVariables;
-import com.patronovskiy.notesHTTPService.domain.FullNote;
 import com.patronovskiy.notesHTTPService.domain.Note;
-import com.patronovskiy.notesHTTPService.domain.RequestNote;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 
 //класс доступа к заметкам, хранящимся в файловой системе
 public class FileSystemStorageNoteDAO implements NoteDAO {
@@ -17,18 +17,24 @@ public class FileSystemStorageNoteDAO implements NoteDAO {
     // количество символов тектса заметки, которые сохраняются в названии, если название не указано
     //путь к файлу со значениями переменных для работы приложения
     @Override
-    public Note save(Note requestNote, String fileStoragePath, int charsNumber, String pathToVariables) {
+    public Note save(Note note, String fileStoragePath, int charsNumber, String pathToVariables) {
 
         long id = getNewId(pathToVariables);
 
         try {
-            Note note = new FullNote(requestNote, id, charsNumber);
+            note.checkAndSetTitle(charsNumber);
+            note.setId(id);
             ObjectMapper mapper = new ObjectMapper();
-            //для имени файла берем id и записываем json
+            //проверяем, существует ли директория
             //todo создать директорию, если не существует
+            if (!Files.exists(Paths.get(fileStoragePath))) {
+                new File(fileStoragePath).mkdirs();
+            }
+            //для имени файла берем id и записываем json
             mapper.writeValue(new File(fileStoragePath + note.getId() + ".json"), note);
             System.out.println("файл создан");
             return note;
+
 
         } catch (IOException exception1) {
             System.out.println("Проблема при сохранении заметки");

@@ -3,7 +3,6 @@ package com.patronovskiy.notesHTTPService.controllers;
 import com.patronovskiy.notesHTTPService.dao.FileSystemStorageNoteDAO;
 import com.patronovskiy.notesHTTPService.dao.NoteDAO;
 import com.patronovskiy.notesHTTPService.domain.Note;
-import com.patronovskiy.notesHTTPService.domain.RequestNote;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -33,9 +32,9 @@ public class NotesController {
     //todo возвращать не заметку, а ResponseEntity??
     //метод, сохраняющий заметку
     @PostMapping()
-    public ResponseEntity saveNote(@RequestBody RequestNote requestNote) {
+    public ResponseEntity saveNote(@RequestBody Note requestNote) {
         //проверяем запрос
-        if(requestNote == null || requestNote.getContent() == null) {
+        if(requestNote.getContent() == null) {
             return ResponseEntity.badRequest().body("Неверный запрос");
         }
 

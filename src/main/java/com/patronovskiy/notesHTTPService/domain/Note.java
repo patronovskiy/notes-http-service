@@ -16,10 +16,18 @@ public class Note {
     public Note(Long id, String content, int charsNumber) {
         this.id = id;
         this.content = content;
-        this.title = content.substring(0, charsNumber);
+        if (this.title == null) {
+            this.title = content.substring(0, charsNumber);
+        }
     }
 
     public Note() {
+    }
+
+    public void checkAndSetTitle(int charsNumber) {
+        if (this.title == null) {
+            this.title = content.substring(0, charsNumber);
+        }
     }
 
     public Long getId() {
@@ -32,5 +40,17 @@ public class Note {
 
     public String getContent() {
         return content;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
+    }
+
+    public void setContent(String content) {
+        this.content = content;
     }
 }
