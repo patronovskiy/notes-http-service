@@ -3,6 +3,7 @@ package com.patronovskiy.notesHTTPService.dao;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.patronovskiy.notesHTTPService.domain.AppVariables;
 import com.patronovskiy.notesHTTPService.domain.Note;
+import org.springframework.web.client.HttpClientErrorException;
 
 import java.io.File;
 import java.io.IOException;
@@ -64,4 +65,29 @@ public class FileSystemStorageNoteDAO implements NoteDAO {
         return id;
     }
 
+
+    //метод для чтения заметки по id из заданной директории
+    //имя заметки совпадает с id
+    @Override
+    public Note getById(long id, String fileStorageDirectory) {
+        try{
+            ObjectMapper objectMapper = new ObjectMapper();
+            Note note = objectMapper.readValue(new File(fileStorageDirectory +id + ".json"), Note.class);
+            return note;
+        } catch (IOException exception) {
+            System.out.println("Проблема при чтении заметки по id");
+        }
+        return null;
+    }
+
+    @Override
+    public Note update(Note note, String fileStorageDirectory) {
+        try {
+            ObjectMapper objectMapper = new ObjectMapper();
+            objectMapper.writeValue(new File(fileStorageDirectory + note.getId() + ".json"), note);
+        } catch (IOException exception) {
+            System.out.println("Проблема при перезаписывании заметки");
+        }
+        return null;
+    }
 }
