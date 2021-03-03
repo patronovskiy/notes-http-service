@@ -2,12 +2,17 @@ package com.patronovskiy.notesHTTPService.dao;
 
 import com.patronovskiy.notesHTTPService.domain.Note;
 
+import java.util.ArrayList;
+
 //интерфейс, декларирующий методы для доступа к заметкам
 public interface NoteDAO {
-    public Note save(Note note, String fileStoragePath, int charsNumber, String pathToVariables);
+    Note saveNote(Note note, String fileStoragePath, int charsNumber, String pathToVariables);
 
-    public Note getById(long id, String fileStorageDirectory);
+    Note getNoteById(long id, String fileStorageDirectory);
 
-    public Note update(Note note, String fileStorageDirectory);
+    Note updateNote(Note note, String fileStorageDirectory);
 
+    ArrayList<Note> getAllNotes(String fileStoragePath, String pathToVariables);
+
+    ArrayList<Note> getNotesByQuery(String query, String fileStoragePath, String pathToVariables);
 }

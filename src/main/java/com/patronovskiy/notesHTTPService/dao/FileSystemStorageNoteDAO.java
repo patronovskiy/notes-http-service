@@ -9,6 +9,7 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 
 //класс доступа к заметкам, хранящимся в файловой системе
 public class FileSystemStorageNoteDAO implements NoteDAO {
@@ -18,7 +19,7 @@ public class FileSystemStorageNoteDAO implements NoteDAO {
     // количество символов тектса заметки, которые сохраняются в названии, если название не указано
     //путь к файлу со значениями переменных для работы приложения
     @Override
-    public Note save(Note note, String fileStoragePath, int charsNumber, String pathToVariables) {
+    public Note saveNote(Note note, String fileStoragePath, int charsNumber, String pathToVariables) {
 
         long id = getNewId(pathToVariables);
 
@@ -69,7 +70,7 @@ public class FileSystemStorageNoteDAO implements NoteDAO {
     //метод для чтения заметки по id из заданной директории
     //имя заметки совпадает с id
     @Override
-    public Note getById(long id, String fileStorageDirectory) {
+    public Note getNoteById(long id, String fileStorageDirectory) {
         try{
             ObjectMapper objectMapper = new ObjectMapper();
             Note note = objectMapper.readValue(new File(fileStorageDirectory +id + ".json"), Note.class);
@@ -80,13 +81,56 @@ public class FileSystemStorageNoteDAO implements NoteDAO {
         return null;
     }
 
+    //метод для обновления заметок
     @Override
-    public Note update(Note note, String fileStorageDirectory) {
+    public Note updateNote(Note note, String fileStorageDirectory) {
         try {
             ObjectMapper objectMapper = new ObjectMapper();
             objectMapper.writeValue(new File(fileStorageDirectory + note.getId() + ".json"), note);
         } catch (IOException exception) {
             System.out.println("Проблема при перезаписывании заметки");
+        }
+        return null;
+    }
+
+    //метод для получения всех заметок списком
+    @Override
+    public ArrayList<Note> getAllNotes(String fileStoragePath, String pathToVariables) {
+        try {
+            ObjectMapper objectMapper = new ObjectMapper();
+            //получаем список id всех заметок
+            ArrayList<Long> ids = objectMapper.readValue(new File(pathToVariables), AppVariables.class).getIdList();
+            //обходим список по id и сохраняем в список заметок
+            ArrayList<Note> notes = new ArrayList<>();
+            for (Long id : ids) {
+                Note note = getNoteById(id, fileStoragePath);
+                notes.add(note);
+            }
+            return notes;
+        } catch (IOException exception) {
+            System.out.println("Проблема при поиске заметок");
+        }
+        return null;
+    }
+
+
+    @Override
+    public ArrayList<Note> getNotesByQuery(String query, String fileStoragePath, String pathToVariables) {
+        try {
+            ObjectMapper objectMapper = new ObjectMapper();
+            //получаем список id всех заметок
+            ArrayList<Long> ids = objectMapper.readValue(new File(pathToVariables), AppVariables.class).getIdList();
+            //обходим список по id и сохраняем в список заметок
+            ArrayList<Note> notes = new ArrayList<>();
+            for (Long id : ids) {
+                Note note = getNoteById(id, fileStoragePath);
+                if(note.getTitle().contains(query) || note.getContent().contains(query)) {
+                    notes.add(note);
+                }
+            }
+            return notes;
+        } catch (IOException exception) {
+            System.out.println("Проблема при поиске заметок по текстовому запросу");
         }
         return null;
     }
