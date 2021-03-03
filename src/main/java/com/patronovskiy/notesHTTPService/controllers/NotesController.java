@@ -4,6 +4,7 @@ import com.patronovskiy.notesHTTPService.dao.FileSystemStorageNoteDAO;
 import com.patronovskiy.notesHTTPService.dao.NoteDAO;
 import com.patronovskiy.notesHTTPService.domain.Note;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -29,8 +30,10 @@ public class NotesController {
     @Value("${variables-path}")
     String pathToVariables;
 
-    //todo возвращать не заметку, а ResponseEntity??
+
     //метод, сохраняющий заметку
+    //В запросе передается body в формате JSON
+    //В ответе возвращается новая заметка в формате JSON
     @PostMapping()
     public ResponseEntity saveNote(@RequestBody Note requestNote) {
         //проверяем запрос
@@ -55,9 +58,28 @@ public class NotesController {
         return null;
     }
 
+    //метод для редактирования заметки по ее id
+    //Для редактирования доступны: заголовок, текст заметки
+    //id передается как path-параметр
+    //Редактируемые параметры передаются в body запроса в формате JSON
+    //todo не возвращать ничего?
     @PutMapping("/{id}")
-    public void updateNote() {
-       //todo
+    public ResponseEntity updateNote(@PathVariable long id, @RequestBody Note requestNote) {
+        //ищем заметку в хранилище по id
+        Note note = noteDAO.getById(id, fileStoragePath);
+        //проверяем, есть ли заметка, если ее нет - возвращаем код 404
+        if (note == null) {
+            return new ResponseEntity("Заметка не найдена", HttpStatus.NOT_FOUND);
+        }
+        //проверяем, что в запросе переданы заголовок и/или текст и обновляем заметку
+        if (requestNote.getTitle() != null) {
+            note.setTitle(requestNote.getTitle());
+        }
+        if(requestNote.getContent() != null) {
+            note.setContent(requestNote.getContent());
+        }
+        noteDAO.update(note, fileStoragePath);
+        return ResponseEntity.ok(note);
     }
 
     @DeleteMapping("/{id}")
