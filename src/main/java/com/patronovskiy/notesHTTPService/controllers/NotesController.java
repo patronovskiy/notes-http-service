@@ -47,9 +47,13 @@ public class NotesController {
     }
 
     @GetMapping("/{id}")
-    public Note getNoteById(long id) {
-        //todo
-        return null;
+    public ResponseEntity getNoteById(@PathVariable long id) {
+        Note note = noteDAO.getById(id, fileStoragePath);
+        //проверяем, есть ли заметка, если ее нет - возвращаем код 404
+        if (note == null) {
+            return new ResponseEntity("Заметка не найдена", HttpStatus.NOT_FOUND);
+        }
+        return ResponseEntity.ok(note);
     }
 
     @GetMapping()
