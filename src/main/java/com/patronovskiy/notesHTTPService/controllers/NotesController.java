@@ -8,6 +8,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
 
 //метод-контроллер для endpoint-а работы с заметками "/notes"
@@ -42,20 +43,35 @@ public class NotesController {
         }
 
         //если в порядке, сохраняем заметку и возвращаем ответ с заметкой и кодом 200
-        Note note = noteDAO.save(requestNote, fileStoragePath, charsNumber, pathToVariables);
+        Note note = noteDAO.saveNote(requestNote, fileStoragePath, charsNumber, pathToVariables);
         return ResponseEntity.ok(note);
     }
 
     @GetMapping("/{id}")
-    public Note getNoteById(long id) {
-        //todo
-        return null;
+    public ResponseEntity getNoteById(@PathVariable long id) {
+        Note note = noteDAO.getNoteById(id, fileStoragePath);
+        //проверяем, есть ли заметка, если ее нет - возвращаем код 404
+        if (note == null) {
+            return new ResponseEntity("Заметка не найдена", HttpStatus.NOT_FOUND);
+        }
+        return ResponseEntity.ok(note);
     }
 
+    //метод, возвращающий все заметки, если параметр query не указан
+    //или заметки, содержащие текст параметра query в заголовке или тексте заметки
     @GetMapping()
-    public ArrayList<Note> getNotes() {
-        //todo
-        return null;
+    public ResponseEntity getNotes(HttpServletRequest request) {
+        String query = request.getParameter("query");
+        if(request.getParameterMap().size() > 1 ||
+           (request.getParameterMap().size() == 1 && query == null)) {
+            return ResponseEntity.badRequest().body("Неверно переданы параметры");
+        } else if (query != null) {
+            ArrayList<Note> notesByQuery = noteDAO.getNotesByQuery(query, fileStoragePath, pathToVariables);
+            return ResponseEntity.ok(notesByQuery);
+        } else {
+            ArrayList<Note> notes = noteDAO.getAllNotes(fileStoragePath, pathToVariables);
+            return ResponseEntity.ok(notes);
+        }
     }
 
     //метод для редактирования заметки по ее id
@@ -66,7 +82,7 @@ public class NotesController {
     @PutMapping("/{id}")
     public ResponseEntity updateNote(@PathVariable long id, @RequestBody Note requestNote) {
         //ищем заметку в хранилище по id
-        Note note = noteDAO.getById(id, fileStoragePath);
+        Note note = noteDAO.getNoteById(id, fileStoragePath);
         //проверяем, есть ли заметка, если ее нет - возвращаем код 404
         if (note == null) {
             return new ResponseEntity("Заметка не найдена", HttpStatus.NOT_FOUND);
@@ -78,7 +94,7 @@ public class NotesController {
         if(requestNote.getContent() != null) {
             note.setContent(requestNote.getContent());
         }
-        noteDAO.update(note, fileStoragePath);
+        noteDAO.updateNote(note, fileStoragePath);
         return ResponseEntity.ok(note);
     }
 
