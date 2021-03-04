@@ -9,6 +9,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
+import java.io.FileNotFoundException;
 import java.util.ArrayList;
 
 //метод-контроллер для endpoint-а работы с заметками "/notes"
@@ -99,8 +100,22 @@ public class NotesController {
     }
 
     @DeleteMapping("/{id}")
-    public void deleteNote() {
-        //todo
+    public ResponseEntity deleteNote(@PathVariable Long id) {
+        if (!isNoteExists(id, fileStoragePath)) {
+            return new ResponseEntity("Заметка не найдена", HttpStatus.NOT_FOUND);
+        } else {
+            noteDAO.deleteNote(id, fileStoragePath, pathToVariables);
+            return ResponseEntity.ok("Заметка с id = " + id + " удалена");
+        }
+    }
+
+    public boolean isNoteExists(Long id, String fileStoragePath) {
+        Note note = noteDAO.getNoteById(id, fileStoragePath);
+        if(note == null) {
+            return false;
+        } else {
+            return true;
+        }
     }
 
 }

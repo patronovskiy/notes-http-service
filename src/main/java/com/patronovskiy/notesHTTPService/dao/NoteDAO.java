@@ -2,6 +2,7 @@ package com.patronovskiy.notesHTTPService.dao;
 
 import com.patronovskiy.notesHTTPService.domain.Note;
 
+import java.io.FileNotFoundException;
 import java.util.ArrayList;
 
 //интерфейс, декларирующий методы для доступа к заметкам
@@ -15,4 +16,6 @@ public interface NoteDAO {
     ArrayList<Note> getAllNotes(String fileStoragePath, String pathToVariables);
 
     ArrayList<Note> getNotesByQuery(String query, String fileStoragePath, String pathToVariables);
+
+    void deleteNote(long id, String fileStoragePath, String pathToVariables);
 }
