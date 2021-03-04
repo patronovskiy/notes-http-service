@@ -53,6 +53,8 @@ public class NotesController {
         return ResponseEntity.ok(note);
     }
 
+    //TODO сделать метод для обработки массива заметок и сохранения множества заметок
+
     //метод для получения заметок по id
     @GetMapping("/{id}")
     public ResponseEntity getNoteById(@PathVariable long id) {

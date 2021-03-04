@@ -12,15 +12,6 @@ public class Note {
         this.content = content;
     }
 
-    //если имя заметки не передано, берем для него заданное количество символов из текста
-    public Note(Long id, String content, int charsNumber) {
-        this.id = id;
-        this.content = content;
-        if (this.title == null) {
-            this.title = content.substring(0, charsNumber);
-        }
-    }
-
     public Note() {
     }
 
