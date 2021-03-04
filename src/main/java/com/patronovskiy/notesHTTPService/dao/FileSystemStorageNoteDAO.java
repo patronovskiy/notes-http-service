@@ -3,7 +3,6 @@ package com.patronovskiy.notesHTTPService.dao;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.patronovskiy.notesHTTPService.domain.AppVariables;
 import com.patronovskiy.notesHTTPService.domain.Note;
-import org.springframework.web.client.HttpClientErrorException;
 
 import java.io.File;
 import java.io.FileNotFoundException;

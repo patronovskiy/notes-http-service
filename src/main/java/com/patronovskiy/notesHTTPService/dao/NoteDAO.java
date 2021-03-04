@@ -1,8 +1,6 @@
 package com.patronovskiy.notesHTTPService.dao;
 
 import com.patronovskiy.notesHTTPService.domain.Note;
-
-import java.io.FileNotFoundException;
 import java.util.ArrayList;
 
 //интерфейс, декларирующий методы для доступа к заметкам
