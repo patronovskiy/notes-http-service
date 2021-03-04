@@ -17,8 +17,13 @@ import java.util.ArrayList;
 @RequestMapping("/notes")
 public class NotesController {
 
+    //ОБЪЕКТЫ ДОСТУПА К ДАННЫМ
+
     //объект доступа к заметкам
     NoteDAO noteDAO = new FileSystemStorageNoteDAO();
+
+
+    //ПЕРЕМЕННЫЕ, ЗАДАННЫЕ В application.properties
 
     //путь к директории для хранения файлов
     @Value("${files-storage-path}")
@@ -33,6 +38,8 @@ public class NotesController {
     String pathToVariables;
 
 
+    //МЕТОДЫ ДЛЯ ОБРАБОТКИ ЗАПРОСОВ
+
     //метод, сохраняющий заметку
     //В запросе передается body в формате JSON
     //В ответе возвращается новая заметка в формате JSON
@@ -42,12 +49,12 @@ public class NotesController {
         if(requestNote.getContent() == null) {
             return ResponseEntity.badRequest().body("Неверный запрос");
         }
-
-        //если в порядке, сохраняем заметку и возвращаем ответ с заметкой и кодом 200
+        //если запрос выполнен правильно, сохраняем заметку и возвращаем ответ с заметкой и кодом 200
         Note note = noteDAO.saveNote(requestNote, fileStoragePath, charsNumber, pathToVariables);
         return ResponseEntity.ok(note);
     }
 
+    //метод для получения заметок по id
     @GetMapping("/{id}")
     public ResponseEntity getNoteById(@PathVariable long id) {
         Note note = noteDAO.getNoteById(id, fileStoragePath);
@@ -79,7 +86,6 @@ public class NotesController {
     //Для редактирования доступны: заголовок, текст заметки
     //id передается как path-параметр
     //Редактируемые параметры передаются в body запроса в формате JSON
-    //todo не возвращать ничего?
     @PutMapping("/{id}")
     public ResponseEntity updateNote(@PathVariable long id, @RequestBody Note requestNote) {
         //ищем заметку в хранилище по id
@@ -99,6 +105,7 @@ public class NotesController {
         return ResponseEntity.ok(note);
     }
 
+    //метод для удаления заметки по id
     @DeleteMapping("/{id}")
     public ResponseEntity deleteNote(@PathVariable Long id) {
         if (!isNoteExists(id, fileStoragePath)) {
@@ -109,6 +116,7 @@ public class NotesController {
         }
     }
 
+    //todo реально ли нужен этот метод?
     public boolean isNoteExists(Long id, String fileStoragePath) {
         Note note = noteDAO.getNoteById(id, fileStoragePath);
         if(note == null) {

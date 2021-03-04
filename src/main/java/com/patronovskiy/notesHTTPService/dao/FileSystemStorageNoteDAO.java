@@ -15,10 +15,11 @@ import java.util.ArrayList;
 //класс доступа к заметкам, хранящимся в файловой системе
 public class FileSystemStorageNoteDAO implements NoteDAO {
 
-    //todo бросать исключение?
+    //МЕТОДЫ ДЛЯ РАБОТЫ С ЗАМЕТКАМИ В ФАЙЛОВОМ ХРАНИЛИЩЕ
+
     //метод для сохранения заметки
     //принимает заметку, путь к директории, куда ее нужно сохранить,
-    // количество символов тектса заметки, которые сохраняются в названии, если название не указано
+    //количество символов тектса заметки, которые сохраняются в названии, если название не указано
     //путь к файлу со значениями переменных для работы приложения
     @Override
     public Note saveNote(Note note, String fileStoragePath, int charsNumber, String pathToVariables) {
@@ -30,7 +31,7 @@ public class FileSystemStorageNoteDAO implements NoteDAO {
             note.setId(id);
             ObjectMapper mapper = new ObjectMapper();
             //проверяем, существует ли директория
-            //todo создать директорию, если не существует
+            //создать директорию, если не существует
             if (!Files.exists(Paths.get(fileStoragePath))) {
                 new File(fileStoragePath).mkdirs();
             }
@@ -38,7 +39,6 @@ public class FileSystemStorageNoteDAO implements NoteDAO {
             mapper.writeValue(new File(fileStoragePath + note.getId() + ".json"), note);
             System.out.println("файл создан");
             return note;
-
 
         } catch (IOException exception1) {
             System.out.println("Проблема при сохранении заметки");
@@ -50,25 +50,6 @@ public class FileSystemStorageNoteDAO implements NoteDAO {
         return null;
     }
 
-
-    private long getNewId(String pathToVariables) {
-        long id = -1;
-        ObjectMapper objectMapper = new ObjectMapper();
-        try {
-            //читаем значение текущего id из файла и берем следующее
-            AppVariables appVariables = objectMapper.readValue(new File(pathToVariables), AppVariables.class);
-            id = appVariables.incrementAndGetId();
-            appVariables.addNoteIdToList(id);
-            //сохраняем значение id в файл
-            objectMapper.writeValue(new File(pathToVariables), appVariables);
-
-        } catch (IOException exception) {
-            exception.printStackTrace();
-        }
-        return id;
-    }
-
-    //todo бросать исключение?
     //метод для чтения заметки по id из заданной директории
     //имя заметки совпадает с id
     @Override
@@ -83,7 +64,6 @@ public class FileSystemStorageNoteDAO implements NoteDAO {
         return null;
     }
 
-    //todo бросать исключение?
     //метод для обновления заметок
     @Override
     public Note updateNote(Note note, String fileStorageDirectory) {
@@ -116,7 +96,8 @@ public class FileSystemStorageNoteDAO implements NoteDAO {
         return null;
     }
 
-
+    //метод для полученис списка заметок, содержащих текст запроса query
+    //в названии или тексте заметки
     @Override
     public ArrayList<Note> getNotesByQuery(String query, String fileStoragePath, String pathToVariables) {
         try {
@@ -138,6 +119,7 @@ public class FileSystemStorageNoteDAO implements NoteDAO {
         return null;
     }
 
+    //метод для удаления заметки по id
     @Override
     public void deleteNote(long id, String fileStoragePath, String pathToVariables) {
             try {
@@ -154,5 +136,25 @@ public class FileSystemStorageNoteDAO implements NoteDAO {
                 System.out.println("Проблема при удалении файла");
                 exception.printStackTrace();
             }
+    }
+
+    //ВСПОМОГАТЕЛЬНЫЕ МЕТОДЫ
+
+    //метод для получения и учета нового id
+    private long getNewId(String pathToVariables) {
+        long id = -1;
+        ObjectMapper objectMapper = new ObjectMapper();
+        try {
+            //читаем значение текущего id из файла и берем следующее
+            AppVariables appVariables = objectMapper.readValue(new File(pathToVariables), AppVariables.class);
+            id = appVariables.incrementAndGetId();
+            appVariables.addNoteIdToList(id);
+            //сохраняем значение id в файл с переменными приложения
+            objectMapper.writeValue(new File(pathToVariables), appVariables);
+
+        } catch (IOException exception) {
+            exception.printStackTrace();
+        }
+        return id;
     }
 }
