@@ -6,6 +6,7 @@ import com.patronovskiy.notesHTTPService.domain.Note;
 import org.springframework.web.client.HttpClientErrorException;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -14,6 +15,7 @@ import java.util.ArrayList;
 //класс доступа к заметкам, хранящимся в файловой системе
 public class FileSystemStorageNoteDAO implements NoteDAO {
 
+    //todo бросать исключение?
     //метод для сохранения заметки
     //принимает заметку, путь к директории, куда ее нужно сохранить,
     // количество символов тектса заметки, которые сохраняются в названии, если название не указано
@@ -66,7 +68,7 @@ public class FileSystemStorageNoteDAO implements NoteDAO {
         return id;
     }
 
-
+    //todo бросать исключение?
     //метод для чтения заметки по id из заданной директории
     //имя заметки совпадает с id
     @Override
@@ -81,6 +83,7 @@ public class FileSystemStorageNoteDAO implements NoteDAO {
         return null;
     }
 
+    //todo бросать исключение?
     //метод для обновления заметок
     @Override
     public Note updateNote(Note note, String fileStorageDirectory) {
@@ -133,5 +136,23 @@ public class FileSystemStorageNoteDAO implements NoteDAO {
             System.out.println("Проблема при поиске заметок по текстовому запросу");
         }
         return null;
+    }
+
+    @Override
+    public void deleteNote(long id, String fileStoragePath, String pathToVariables) {
+            try {
+                File note = new File(fileStoragePath + id + ".json");
+                if (note.delete() == false) {
+                    System.out.println("Файл не может быть удален");
+                    throw new FileNotFoundException(" заметка с id=" + id + " не найдена");
+                }
+                ObjectMapper objectMapper = new ObjectMapper();
+                AppVariables appVariables = objectMapper.readValue(new File(pathToVariables), AppVariables.class);
+                appVariables.removeNoteFromList(id);
+                objectMapper.writeValue(new File(pathToVariables), appVariables);
+            } catch (IOException exception) {
+                System.out.println("Проблема при удалении файла");
+                exception.printStackTrace();
+            }
     }
 }

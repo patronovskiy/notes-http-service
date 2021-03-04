@@ -29,4 +29,8 @@ public class AppVariables {
     public void addNoteIdToList(long id) {
         this.idList.add(id);
     }
+
+    public void removeNoteFromList(Long id) {
+        this.idList.remove(id);
+    }
 }
