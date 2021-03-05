@@ -15,9 +15,14 @@ public class Note {
     public Note() {
     }
 
+    //todo перенести в конструктор?
     public void checkAndSetTitle(int charsNumber) {
         if (this.title == null) {
-            this.title = content.substring(0, charsNumber);
+            if (this.content.length() >= charsNumber) {
+                this.title = content.substring(0, charsNumber);
+            } else {
+                this.title = this.content;
+            }
         }
     }
 
