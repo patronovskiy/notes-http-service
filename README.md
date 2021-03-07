@@ -1,4 +1,5 @@
-# notes-http-service
+# notes-http-service 
+version 1.0.0
 RESTful API сервис для работы с заметками (короткими текстовыми документами).
 
 ## Общее описание
