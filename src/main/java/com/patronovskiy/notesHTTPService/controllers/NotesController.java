@@ -3,6 +3,7 @@ package com.patronovskiy.notesHTTPService.controllers;
 import com.patronovskiy.notesHTTPService.dao.FileSystemStorageNoteDAO;
 import com.patronovskiy.notesHTTPService.dao.NoteDAO;
 import com.patronovskiy.notesHTTPService.domain.Note;
+import com.patronovskiy.notesHTTPService.domain.ResponseMessages;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -46,7 +47,7 @@ public class NotesController {
     public ResponseEntity saveNote(@RequestBody Note requestNote) {
         //проверяем запрос
         if(requestNote.getContent() == null) {
-            return ResponseEntity.badRequest().body("Неверный запрос");
+            return ResponseEntity.badRequest().body(ResponseMessages.BAD_REQUEST_MESSAGE.getMessage());
         }
         //если запрос выполнен правильно, сохраняем заметку и возвращаем ответ с заметкой и кодом 200
         Note note = noteDAO.saveNote(requestNote, fileStoragePath, charsNumber, pathToVariables);
@@ -60,12 +61,12 @@ public class NotesController {
     public ResponseEntity getNoteById(@PathVariable long id) {
         //проверяем id на валидность (неотрицательное число long)
         if (id < 1) {
-            return new ResponseEntity("Некорректный id", HttpStatus.BAD_REQUEST);
+            return new ResponseEntity(ResponseMessages.INCORRECT_ID_MESSAGE.getMessage(), HttpStatus.BAD_REQUEST);
         }
         Note note = noteDAO.getNoteById(id, fileStoragePath);
         //проверяем, есть ли заметка, если ее нет - возвращаем код 404
         if (note == null) {
-            return new ResponseEntity("Заметка не найдена", HttpStatus.NOT_FOUND);
+            return new ResponseEntity(ResponseMessages.NOTE_NOT_FOUND_MESSAGE.getMessage(), HttpStatus.NOT_FOUND);
         }
         return ResponseEntity.ok(note);
     }
@@ -77,11 +78,11 @@ public class NotesController {
         String query = request.getParameter("query");
         if(request.getParameterMap().size() > 1 ||
            (request.getParameterMap().size() == 1 && query == null)) {
-            return ResponseEntity.badRequest().body("Неверно переданы параметры");
+            return ResponseEntity.badRequest().body(ResponseMessages.INCORRECT_PARAMETERS_MESSAGE.getMessage());
         } else if (query != null) {
             ArrayList<Note> notesByQuery = noteDAO.getNotesByQuery(query, fileStoragePath, pathToVariables);
             if (notesByQuery.size() == 0) {
-                return new ResponseEntity("Заметки, удовлетворяющие запросу, не найдены", HttpStatus.NOT_FOUND);
+                return new ResponseEntity(ResponseMessages.NOTES_BY_QUERY_NOT_FOUND_MESSAGE.getMessage(), HttpStatus.NOT_FOUND);
             }
             return ResponseEntity.ok(notesByQuery);
         } else {
@@ -100,7 +101,7 @@ public class NotesController {
         Note note = noteDAO.getNoteById(id, fileStoragePath);
         //проверяем, есть ли заметка, если ее нет - возвращаем код 404
         if (note == null) {
-            return new ResponseEntity("Заметка не найдена", HttpStatus.NOT_FOUND);
+            return new ResponseEntity(ResponseMessages.NOTE_NOT_FOUND_MESSAGE.getMessage(), HttpStatus.NOT_FOUND);
         }
         //проверяем, что в запросе переданы заголовок и/или текст и обновляем заметку
         if (requestNote.getTitle() != null) {
@@ -117,10 +118,10 @@ public class NotesController {
     @DeleteMapping("/{id}")
     public ResponseEntity deleteNote(@PathVariable Long id) {
         if (!isNoteExists(id, fileStoragePath)) {
-            return new ResponseEntity("Заметка не найдена", HttpStatus.NOT_FOUND);
+            return new ResponseEntity(ResponseMessages.NOTE_NOT_FOUND_MESSAGE.getMessage(), HttpStatus.NOT_FOUND);
         } else {
             noteDAO.deleteNote(id, fileStoragePath, pathToVariables);
-            return ResponseEntity.ok("Заметка с id = " + id + " удалена");
+            return ResponseEntity.ok(ResponseMessages.NOTE_DELETED_MESSAGE.getMessage() + " (id = " + id + ")");
         }
     }
 
