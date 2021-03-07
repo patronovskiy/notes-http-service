@@ -1,6 +1,5 @@
 package com.patronovskiy.notesHTTPService.ApiTest;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -9,15 +8,12 @@ import org.junit.jupiter.api.Test;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
-import java.util.ArrayList;
-
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.hamcrest.Matchers.containsString;
 
-import static org.assertj.core.api.Assertions.assertThat;
 
 //тесты для POST запроса (сохранение заметок)
 @SpringBootTest
@@ -77,6 +73,7 @@ public class SaveNoteTest {
                 .content(json2)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andDo(print())
+                //ожидаем статус 200
                 .andExpect(status().isOk())
                 //ожидаем, что определен id
                 .andExpect(content().string(containsString(quote+"id"+quote+":")))
@@ -90,6 +87,7 @@ public class SaveNoteTest {
                 .content(json3)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andDo(print())
+                //ожидаем статус 200
                 .andExpect(status().isOk())
                 //ожидаем, что определен id
                 .andExpect(content().string(containsString(quote+"id"+quote+":")))
@@ -98,6 +96,10 @@ public class SaveNoteTest {
                 //ожидаем, что content соответсвует переданному
                 .andExpect(content().string(containsString(quote+"content"+quote+":"+quote+""+expectedContent3)));
 
+    }
+
+    @Test
+    public void shouldReturnBadRequestResponse() throws Exception {
         //проверяем случай 4
         this.mockMvc.perform(post("/notes")
                 .content(json4)

@@ -20,4 +20,6 @@ public class NotesControllerTest {
     public void test() throws Exception {
             assertThat(notesController).isNotNull();
     }
+
+    //todo проверить запросы на несуществующие эндпойнты
 }

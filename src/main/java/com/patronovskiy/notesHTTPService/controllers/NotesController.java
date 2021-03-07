@@ -58,6 +58,10 @@ public class NotesController {
     //метод для получения заметок по id
     @GetMapping("/{id}")
     public ResponseEntity getNoteById(@PathVariable long id) {
+        //проверяем id на валидность (неотрицательное число long)
+        if (id < 1) {
+            return new ResponseEntity("Некорректный id", HttpStatus.BAD_REQUEST);
+        }
         Note note = noteDAO.getNoteById(id, fileStoragePath);
         //проверяем, есть ли заметка, если ее нет - возвращаем код 404
         if (note == null) {
