@@ -1,5 +1,7 @@
 package com.patronovskiy.notesHTTPService.domain;
 
+//перечисление для сообщений в http-ответах
+//передаются в теле сообщения, если нет тела json
 public enum ResponseMessages {
     NOTE_NOT_FOUND_MESSAGE("Заметка не найдена"),
     NOTE_DELETED_MESSAGE("Заметка успешно удалена"),
