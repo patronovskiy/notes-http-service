@@ -23,7 +23,7 @@ import java.util.ArrayList;
 public class ServiceController {
 
     //ключ для очистки хранилища
-    //todo значение в application.properties должно быть недоступно извне
+    //значение в application.properties должно быть недоступно извне
     @Value("${clear-key}")
     int clearKey;
 

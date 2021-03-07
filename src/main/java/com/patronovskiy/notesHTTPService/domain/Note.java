@@ -15,7 +15,8 @@ public class Note {
     public Note() {
     }
 
-    //todo перенести в конструктор?
+    //метод для проверки наличия поля title
+    //при его отсутвии - устанавливаем заданное количество символов из поля content
     public void checkAndSetTitle(int charsNumber) {
         if (this.title == null) {
             if (this.content.length() >= charsNumber) {

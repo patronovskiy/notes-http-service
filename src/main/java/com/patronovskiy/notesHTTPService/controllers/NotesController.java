@@ -54,7 +54,6 @@ public class NotesController {
         return ResponseEntity.ok(note);
     }
 
-    //TODO сделать метод для обработки массива заметок и сохранения множества заметок
 
     //метод для получения заметок по id
     @GetMapping("/{id}")
@@ -126,7 +125,7 @@ public class NotesController {
         }
     }
 
-    //todo реально ли нужен этот метод?
+    //метод для проверки того, существует ли заметка
     public boolean isNoteExists(Long id, String fileStoragePath) {
         Note note = noteDAO.getNoteById(id, fileStoragePath);
         if(note == null) {
