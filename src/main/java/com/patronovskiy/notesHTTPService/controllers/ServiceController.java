@@ -5,7 +5,6 @@ import com.patronovskiy.notesHTTPService.dao.FileSystemStorageNoteDAO;
 import com.patronovskiy.notesHTTPService.dao.NoteDAO;
 import com.patronovskiy.notesHTTPService.domain.AppVariables;
 import com.patronovskiy.notesHTTPService.domain.ResponseMessages;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -40,7 +39,7 @@ public class ServiceController {
 
     //метод для очистки хранилища и сброса сервиса в первоначальное состояние (id обнуляется)
     @GetMapping("/clear")
-    public ResponseEntity clearServise(@RequestParam int key) {
+    public ResponseEntity clearService(@RequestParam int key) {
         if(key == clearKey) {
             try {
                 ObjectMapper objectMapper = new ObjectMapper();
@@ -50,7 +49,7 @@ public class ServiceController {
                     noteDAO.deleteNote(id, fileStoragePath, pathToVariables);
                 }
                 //обнуляем переменные
-                //здесь нужно либо снова прочитать внешний файл applicationVAriables.json
+                //здесь нужно либо снова прочитать внешний файл applicationVariables.json
                 //либо очистить список вручную
                 appVariables.clear();
                 objectMapper.writeValue(new File(pathToVariables), appVariables);
