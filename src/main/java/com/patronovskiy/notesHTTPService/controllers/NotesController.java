@@ -80,6 +80,9 @@ public class NotesController {
             return ResponseEntity.badRequest().body("Неверно переданы параметры");
         } else if (query != null) {
             ArrayList<Note> notesByQuery = noteDAO.getNotesByQuery(query, fileStoragePath, pathToVariables);
+            if (notesByQuery.size() == 0) {
+                return new ResponseEntity("Заметки, удовлетворяющие запросу, не найдены", HttpStatus.NOT_FOUND);
+            }
             return ResponseEntity.ok(notesByQuery);
         } else {
             ArrayList<Note> notes = noteDAO.getAllNotes(fileStoragePath, pathToVariables);

@@ -7,11 +7,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.io.File;
-import java.util.ArrayList;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
@@ -51,7 +49,10 @@ public class GetNoteByIdTest {
                 .andExpect(content().string(containsString(quote+"id"+quote+":"+validId)))
                 .andExpect(content().string(containsString(quote+"title"+quote+":")))
                 .andExpect(content().string(containsString(quote+"content"+quote+":")));
+    }
 
+    @Test
+    public void shoudReturnBadRequestResponse() throws Exception {
         //проверяем случай 2 - получение заметки по невалидному id (отрицательное число) - ошибка bad request
         String invalidId1 = "-1";
         this.mockMvc.perform(get("/notes/"+ invalidId1))
@@ -65,10 +66,15 @@ public class GetNoteByIdTest {
                 .andDo(print())
                 //ожидаем статус BadRequest 400
                 .andExpect(status().isBadRequest());
+    }
 
+    public void shouldReturnNotFoundResponse() throws Exception {
         //проверяем случай 4 - заметка не найдена - ошибка not found
         //берем id, не входящий в список
+        ObjectMapper objectMapper = new ObjectMapper();
+        AppVariables appVariables = objectMapper.readValue(new File(pathToVariables), AppVariables.class);
         Long notExistingId = appVariables.getIdList().get(appVariables.getIdList().size()-1) + 10;
+
         this.mockMvc.perform(get("/notes/"+ notExistingId))
                 .andDo(print())
                 //ожидаем статус NotFound 404
