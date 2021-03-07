@@ -117,6 +117,7 @@ public class NotesController {
     //метод для удаления заметки по id
     @DeleteMapping("/{id}")
     public ResponseEntity deleteNote(@PathVariable Long id) {
+        //проверяем, существует ли заметка
         if (!isNoteExists(id, fileStoragePath)) {
             return new ResponseEntity(ResponseMessages.NOTE_NOT_FOUND_MESSAGE.getMessage(), HttpStatus.NOT_FOUND);
         } else {
