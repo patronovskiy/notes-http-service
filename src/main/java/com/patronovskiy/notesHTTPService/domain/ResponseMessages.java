@@ -8,7 +8,8 @@ public enum ResponseMessages {
     BAD_REQUEST_MESSAGE("Неверный запрос"),
     INCORRECT_ID_MESSAGE("Некорректный id"),
     INCORRECT_PARAMETERS_MESSAGE("Некорректно переданы параметры"),
-    NOTES_BY_QUERY_NOT_FOUND_MESSAGE("Заметки, удовлетворяющие запросу, не найдены");
+    NOTES_BY_QUERY_NOT_FOUND_MESSAGE("Заметки, удовлетворяющие запросу, не найдены"),
+    ALL_NOTES_DELETED_MESSAGE("Все заметки успешно удалены");
 
     private String message;
 

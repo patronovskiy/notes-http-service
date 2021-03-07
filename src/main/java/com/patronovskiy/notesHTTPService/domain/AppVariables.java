@@ -42,4 +42,10 @@ public class AppVariables {
     public void removeNoteFromList(Long id) {
         this.idList.remove(id);
     }
+
+    //сбросить все значения к начальным
+    public void clear() {
+        this.id = 0;
+        this.idList = new ArrayList<>();
+    }
 }
