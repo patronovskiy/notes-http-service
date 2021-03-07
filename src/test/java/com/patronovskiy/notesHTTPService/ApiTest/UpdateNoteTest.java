@@ -14,9 +14,7 @@ import java.io.File;
 import java.time.LocalDate;
 import java.time.LocalTime;
 
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -81,6 +79,11 @@ public class UpdateNoteTest {
                 .andExpect(status().isOk())
                 //ожидаем, что вернется заметка с новым content
                 .andExpect(content().string(containsString(quote+"content"+quote+":"+quote+ content2)));
+
+        //удаляем заметку после теста
+        this.mockMvc.perform(delete("/notes/" + id))
+                //ожидаем статус 200
+                .andExpect(status().isOk());
     }
 
     @Test

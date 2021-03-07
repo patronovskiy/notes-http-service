@@ -1,5 +1,7 @@
 package com.patronovskiy.notesHTTPService.ApiTest;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.patronovskiy.notesHTTPService.domain.AppVariables;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -8,6 +10,9 @@ import org.junit.jupiter.api.Test;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
+import java.io.File;
+
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
@@ -27,6 +32,10 @@ public class SaveNoteTest {
     //задано в application.properties
     @Value("${chars-number}")
     int charsNumber;
+
+    //путь к переменным приложения
+    @Value("${variables-path}")
+    String pathToVariables;
 
     //случай 1: нет поля title и длина поля content >= charsNumber
     String expectedContent1 = "test content 2 12345678910 123456789";
@@ -49,6 +58,13 @@ public class SaveNoteTest {
 
     @Test
     public void shouldReturnFullNoteInJson() throws Exception {
+
+        //извлекаем список существующих id на данный момент
+        ObjectMapper objectMapper = new ObjectMapper();
+        AppVariables appVariables = objectMapper.readValue(new File(pathToVariables), AppVariables.class);
+        //последний использованный id - вновь создаваемые заметки имеют id, следующий по порядку
+        Long lastId = appVariables.getId();
+
         //при экранировании кавычек слэши остаются в substring в методе containsString()
         //поэтому подставляем кавычки через переменную
         final char quote = (char) 34;
@@ -96,6 +112,16 @@ public class SaveNoteTest {
                 //ожидаем, что content соответсвует переданному
                 .andExpect(content().string(containsString(quote+"content"+quote+":"+quote+""+expectedContent3)));
 
+        //удаляем заметки после тестов
+        this.mockMvc.perform(delete("/notes/" + (lastId + 1)))
+                //ожидаем статус 200
+                .andExpect(status().isOk());
+        this.mockMvc.perform(delete("/notes/" + (lastId + 2)))
+                //ожидаем статус 200
+                .andExpect(status().isOk());
+        this.mockMvc.perform(delete("/notes/" + (lastId + 3)))
+                //ожидаем статус 200
+                .andExpect(status().isOk());
     }
 
     @Test

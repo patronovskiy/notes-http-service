@@ -15,8 +15,7 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.ArrayList;
 
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -60,6 +59,13 @@ public class GetNotesTest {
     @Test
     public void shouldReturnNotesByQueryInJson() throws Exception {
         //случай 2 - возвращаются заметки по запросу query
+
+        //извлекаем список существующих id на данный момент
+        ObjectMapper objectMapper = new ObjectMapper();
+        AppVariables appVariables = objectMapper.readValue(new File(pathToVariables), AppVariables.class);
+        //последний использованный id - вновь создаваемые заметки имеют id, следующий по порядку
+        Long lastId = appVariables.getId();
+
         //сохраняем заметки с запросом в title и content
         //в запросе указываем дату и время теста, чтобы не отрабатывали другие заметки
         String query = "mock testing query " + LocalDate.now() + LocalTime.now();
@@ -82,6 +88,14 @@ public class GetNotesTest {
                 .andExpect(content().string(containsString(quote+"content"+quote+":"+quote+"query test content")))
                 .andExpect(content().string(containsString(quote+"title"+quote+":"+quote+"query test title")))
                 .andExpect(content().string(containsString(quote+"content"+quote+":"+quote+"this is " + query)));
+
+        //удаляем заметки после тестов
+        this.mockMvc.perform(delete("/notes/" + (lastId + 1)))
+                //ожидаем статус 200
+                .andExpect(status().isOk());
+        this.mockMvc.perform(delete("/notes/" + (lastId + 2)))
+                //ожидаем статус 200
+                .andExpect(status().isOk());
     }
 
     @Test

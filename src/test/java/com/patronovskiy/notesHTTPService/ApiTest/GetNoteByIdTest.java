@@ -7,17 +7,22 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.io.File;
+import java.time.LocalDate;
+import java.time.LocalTime;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.hamcrest.Matchers.containsString;
 
-//этот тест надо запускать после saveNoteTest, чтобы точно были сохраненные заметки
+//тест медода для получения заметки по id (GET)
 @SpringBootTest
 @AutoConfigureMockMvc
 public class GetNoteByIdTest {
@@ -35,10 +40,20 @@ public class GetNoteByIdTest {
 
     @Test
     public void shouldReturnNoteInJsonById() throws Exception{
+        //предварительно создаем заметку
+        String content = "first content " + LocalDate.now() + LocalTime.now();
+        String testJson = "{\"title\":\"" + "title 1" + "\", \"content\":\"" + content +"\"}";
+        this.mockMvc.perform(post("/notes")
+                .content(testJson)
+                .contentType(MediaType.APPLICATION_JSON))
+                //ожидаем, что статус OK 200
+                .andExpect(status().isOk());
+
         //извлекаем список существующих id на данный момент
+        //id этой заметки - последний сохраненный id
         ObjectMapper objectMapper = new ObjectMapper();
         AppVariables appVariables = objectMapper.readValue(new File(pathToVariables), AppVariables.class);
-        Long validId = appVariables.getIdList().get(0);
+        Long validId = appVariables.getId();
 
         //проверяем случай 1 - получение заметки по валидному id
         this.mockMvc.perform(get("/notes/"+ validId))
@@ -49,10 +64,15 @@ public class GetNoteByIdTest {
                 .andExpect(content().string(containsString(quote+"id"+quote+":"+validId)))
                 .andExpect(content().string(containsString(quote+"title"+quote+":")))
                 .andExpect(content().string(containsString(quote+"content"+quote+":")));
+
+        //удаляем заметку после теста
+        this.mockMvc.perform(delete("/notes/" + validId))
+                //ожидаем статус 200
+                .andExpect(status().isOk());
     }
 
     @Test
-    public void shoudReturnBadRequestResponse() throws Exception {
+    public void shouldReturnBadRequestResponse() throws Exception {
         //проверяем случай 2 - получение заметки по невалидному id (отрицательное число) - ошибка bad request
         String invalidId1 = "-1";
         this.mockMvc.perform(get("/notes/"+ invalidId1))
@@ -73,7 +93,7 @@ public class GetNoteByIdTest {
         //берем id, не входящий в список
         ObjectMapper objectMapper = new ObjectMapper();
         AppVariables appVariables = objectMapper.readValue(new File(pathToVariables), AppVariables.class);
-        Long notExistingId = appVariables.getIdList().get(appVariables.getIdList().size()-1) + 10;
+        Long notExistingId = appVariables.getId() + 10;
 
         this.mockMvc.perform(get("/notes/"+ notExistingId))
                 .andDo(print())
